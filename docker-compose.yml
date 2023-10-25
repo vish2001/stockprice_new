@@ -1,0 +1,23 @@
+version: '3'
+services:
+  server1:
+    image: ads:lab
+    build:
+      context: .
+    container_name: server1
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./stockprice_server:/app
+    command: python /app/server.py
+  
+  client1:
+    image: ads:lab
+    build:
+      context: .
+    container_name: client1
+    depends_on:
+      - server1
+    volumes:
+      - ./stockprice_client:/app
+    command: python /app/client.py 
