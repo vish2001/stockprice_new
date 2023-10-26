@@ -6,25 +6,66 @@ services:
       context: .
     container_name: server1
     ports:
-      - "1111:1111"
+       - "5001:5001"
     volumes:
       - ./stockprice_server:/app
     networks:
       - mynetwork
-    command: python /app/server.py 1111
-  
-  client1:
+    command: python /app/server.py 5001
+
+  server2:
     image: ads:lab
     build:
       context: .
-    container_name: client1
-    depends_on:
-      - server1
+    container_name: server2
+    ports:
+       - "5002:5002"
+    volumes:
+      - ./stockprice_server:/app
+    networks:
+      - mynetwork
+    command: python /app/server.py  5002  
+
+  server3:
+    image: ads:lab
+    build:
+      context: .
+    container_name: server3
+    ports:
+      - "5003:5003"
+    volumes:
+      - ./stockprice_server:/app
+    networks:
+      - mynetwork
+    command: python /app/server.py  5003    
+  
+  client:
+    image: ads:lab
+    build:
+      context: .
+    #container_name: client_no.
+    depends_on:    
+      - nginx
+    scale : 10
     volumes:
       - ./stockprice_client:/app
     networks:
       - mynetwork
     command: python /app/client.py 
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8087:8087"
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+    depends_on:
+      - server1
+      - server2
+      - server3       
+    networks:
+      - mynetwork
+
 
 networks:
   mynetwork:

@@ -30,16 +30,19 @@ class StockPriceClient:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    client = StockPriceClient("server1", 1111)
+    client = StockPriceClient("nginx", 8087)
     # List of symbols to fetch prices for
     symbols = ["AAPL", "TSLA", "GOOG", "MSFT", "AMZN", "NVDA"]
     prices = client.fetch_stock_prices(symbols)
-
-    if prices:
+    
+    if prices is not None:
         for item in prices:
             symbol = item['symbol']
-            price = item['data']['close']
-            print(f"Symbol: {symbol} and Price: ${price}")
+            if item['data'] is not None :
+                price = item['data']['close']
+                print(f"Symbol: {symbol} and Price: ${price}")
+            else:
+                continue
     else:
         print("Error fetching stock prices.")
     

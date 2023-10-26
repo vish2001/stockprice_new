@@ -2,6 +2,8 @@ import rpyc
 import requests
 import logging
 from rpyc.utils.server import ThreadPoolServer
+from datetime import datetime
+import sys
 
 # Configure the logging settings
 logging.basicConfig(level=logging.INFO)
@@ -25,8 +27,10 @@ class StockDataFetcher:
         cache_entry = self.stock_cache.get(symbol)
         if cache_entry is not None:
             # Check if the cache entry is more than one day old
-            current_date = cache_entry['date']
-            if current_date != datetime.now().date():
+            current_date_obj = cache_entry['date']
+            datetime_obj = datetime.strptime(current_date_obj, "%Y-%m-%dT%H:%M:%S%z")
+            curr_date = datetime_obj.date()
+            if curr_date != datetime.now().date():
                 # Invalidate the cache entry if it's older than one day
                 logging.debug(f"Cache entry for symbol '{symbol}' is older than one day. Invalidating.")
                 del self.stock_cache[symbol]
@@ -86,8 +90,8 @@ class StockService(rpyc.Service):
                 if fetched_symbol_data is not None:
                     self.stock_data_fetcher.store_data_in_cache(symbol, fetched_symbol_data)
                     logging.debug(f'Data for {symbol} fetched from API and stored in cache.')
-            price = fetched_symbol_data
-            return {'symbol': symbol, 'data': price}
+            data = fetched_symbol_data
+            return {'symbol': symbol, 'data': data}
 
         # Use a list comprehension to fetch data for all symbols
         reply = [fetch_symbol_price(symbol) for symbol in symbols]
@@ -97,6 +101,9 @@ class StockService(rpyc.Service):
 
 
 if __name__ == "__main__":
-    server = ThreadPoolServer(StockService(), port=1111)
+    if len(sys.argv) != 2:
+        sys.exit(1)
+    portn = int(sys.argv[1])
+    server = ThreadPoolServer(StockService(), port=portn)
     logging.info("Starting Stock Data RPC Server...")
     server.start()
