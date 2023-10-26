@@ -43,10 +43,10 @@ services:
     image: ads:lab
     build:
       context: .
-    container_name: client1
-    depends_on:
-    scale: 3
+    # container_name: client1
+    depends_on:    
       - nginx
+    scale : 3
     volumes:
       - ./stockprice_client:/app
     networks:
@@ -60,7 +60,9 @@ services:
     volumes:
       - "./nginx.conf:/etc/nginx/nginx.conf"
     depends_on:
-      - server1 
+      - server1
+      - server2
+      - server3       
     networks:
       - mynetwork
 
