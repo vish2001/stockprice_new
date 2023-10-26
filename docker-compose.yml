@@ -6,10 +6,12 @@ services:
       context: .
     container_name: server1
     ports:
-      - "8000:8000"
+      - "1111:1111"
     volumes:
       - ./stockprice_server:/app
-    command: python /app/server.py
+    networks:
+      - mynetwork
+    command: python /app/server.py 1111
   
   client1:
     image: ads:lab
@@ -20,4 +22,10 @@ services:
       - server1
     volumes:
       - ./stockprice_client:/app
+    networks:
+      - mynetwork
     command: python /app/client.py 
+
+networks:
+  mynetwork:
+    driver: bridge
