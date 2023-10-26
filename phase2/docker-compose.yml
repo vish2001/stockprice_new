@@ -45,6 +45,7 @@ services:
       context: .
     container_name: client1
     depends_on:
+    scale: 3
       - nginx
     volumes:
       - ./stockprice_client:/app
