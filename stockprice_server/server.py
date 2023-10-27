@@ -94,7 +94,7 @@ class StockService(rpyc.Service):
 
         # Use a list comprehension to fetch data for all symbols
         reply = [fetch_symbol_price(symbol) for symbol in symbols]
-        logging.info(f"Server {self.server_id} sent response to Client {client_id}: {reply}")
+        logging.debug(f"Server {self.server_id} sent response to Client {client_id}: {reply}")
         
         return reply
 

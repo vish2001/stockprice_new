@@ -46,7 +46,7 @@ services:
     #container_name: client_no.
     depends_on:    
       - nginx
-    scale : 10
+    scale : 30
     volumes:
       - ./stockprice_client:/app
     networks:
