@@ -9,7 +9,7 @@ import sys
 logging.basicConfig(level=logging.INFO)
 
 # Marketstack API key
-api_key = '7075fc97a8e59c82b055171cd5037ed3'
+api_key = 'f28ae231f445ee199e07f8c4abf10026'
 
 class StockDataFetcher:
     def __init__(self):
@@ -75,9 +75,7 @@ class StockService(rpyc.Service):
     def on_disconnect(self, conn):
         pass
 
-    def exposed_fetch_stock_data(self, req_params):
-        client_id = req_params["client_id"]
-        symbols = req_params['symbols']
+    def exposed_fetch_stock_data(self, symbols):
 
         def fetch_symbol_price(symbol):
             # First search the cache if data already exists
