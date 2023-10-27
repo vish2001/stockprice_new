@@ -2,6 +2,7 @@ import rpyc
 import time
 import logging
 import random
+import socket
 
 class StockPriceClient:
     def __init__(self, host, port):
@@ -27,13 +28,13 @@ class StockPriceClient:
             self.conn.close()
             self.conn = None
 
-    def fetch_stock_prices(self, symbols):
+    def fetch_stock_prices(self,client_id,symbols):
         if not self.is_connected():
             self.connect()
         try:
             # Time before the RPC call
             start_time = time.perf_counter_ns()
-            current_prices = self.conn.root.exposed_fetch_stock_data(symbols)
+            current_prices = self.conn.root.exposed_fetch_stock_data(client_id, symbols)
             # After receiving the response
             end_time = time.perf_counter_ns()
             response_time = end_time - start_time
@@ -54,6 +55,7 @@ class StockPriceClient:
             return None
 
 if __name__ == "__main__":
+    client_id = socket.gethostname()
     logging.basicConfig(level=logging.INFO)
     client = StockPriceClient("nginx", 8087)
     # List of symbols to fetch prices for.
@@ -66,9 +68,9 @@ if __name__ == "__main__":
     ]
     
     symbols_mapped = random.sample(symbols, random.randint(1, 6))
-    logging.info("sent symbols:")
-    logging.info(symbols_mapped)
-    prices = client.fetch_stock_prices(symbols_mapped)
+    # logging.info("sent symbols:")
+    # logging.info(symbols_mapped)
+    prices = client.fetch_stock_prices(client_id, symbols_mapped)
     logging.debug(prices)
     try:    
         if prices is not None:
@@ -76,8 +78,7 @@ if __name__ == "__main__":
                 symbol = item['symbol']
                 if item['data'] is not None :
                     price = item['data']['close']
-                    print(f"Symbol: {symbol} and Price: ${price}")
-                    #client.disconnect()
+                    print(f"Client {client_id}: Symbol: {symbol} and Price: ${price} (served by Server {item['server']})")
                 else:
                     continue
         else:

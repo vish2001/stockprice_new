@@ -66,7 +66,8 @@ class StockDataFetcher:
 
 
 class StockService(rpyc.Service):
-    def __init__(self):
+    def __init__(self, server_id):
+        self.server_id = server_id
         self.stock_data_fetcher = StockDataFetcher()
 
     def on_connect(self, conn):
@@ -75,8 +76,8 @@ class StockService(rpyc.Service):
     def on_disconnect(self, conn):
         pass
 
-    def exposed_fetch_stock_data(self, symbols):
-
+    def exposed_fetch_stock_data(self, client_id, symbols):
+        logging.info(f"Server {self.server_id} received request from Client {client_id}: Symbols requested - {symbols}")
         def fetch_symbol_price(symbol):
             # First search the cache if data already exists
             fetched_symbol_data = self.stock_data_fetcher.get_data_from_cache(symbol)
@@ -89,19 +90,21 @@ class StockService(rpyc.Service):
                     self.stock_data_fetcher.store_data_in_cache(symbol, fetched_symbol_data)
                     logging.debug(f'Data for {symbol} fetched from API and stored in cache.')
             data = fetched_symbol_data
-            return {'symbol': symbol, 'data': data}
+            return {'symbol': symbol, 'data': data, 'server': self.server_id}
 
         # Use a list comprehension to fetch data for all symbols
         reply = [fetch_symbol_price(symbol) for symbol in symbols]
-
-        #logging.info(f'Client {client_id} requested data for {symbols}: Server replied {reply}')
+        logging.info(f"Server {self.server_id} sent response to Client {client_id}: {reply}")
+        
         return reply
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        sys.exit(1)
-    portn = int(sys.argv[1])
-    server = ThreadPoolServer(StockService(), port=portn)
+    if len(sys.argv) != 3:
+            sys.exit(1)
+    server_id = sys.argv[1]  # Pass server ID as an argument
+    portn = int(sys.argv[2])
+    logging.debug(sys.argv)
+    server = ThreadPoolServer(StockService(server_id), port=portn)
     logging.info("Starting Stock Data RPC Server...")
     server.start()

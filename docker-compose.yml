@@ -11,7 +11,7 @@ services:
       - ./stockprice_server:/app
     networks:
       - mynetwork
-    command: python /app/server.py 5001
+    command: python /app/server.py 1 5001
 
   server2:
     image: ads:lab
@@ -24,7 +24,7 @@ services:
       - ./stockprice_server:/app
     networks:
       - mynetwork
-    command: python /app/server.py  5002  
+    command: python /app/server.py 2 5002  
 
   server3:
     image: ads:lab
@@ -37,7 +37,7 @@ services:
       - ./stockprice_server:/app
     networks:
       - mynetwork
-    command: python /app/server.py  5003    
+    command: python /app/server.py 3 5003    
   
   client:
     image: ads:lab
