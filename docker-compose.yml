@@ -46,12 +46,15 @@ services:
     #container_name: client_no.
     depends_on:    
       - nginx
-    scale : 30
+    # scale : 3
+    deploy:
+      replicas: 3
     volumes:
       - ./stockprice_client:/app
     networks:
       - mynetwork
     command: python /app/client.py 
+    restart: always
 
   nginx:
     image: nginx:latest
