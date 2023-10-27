@@ -9,7 +9,7 @@ import sys
 logging.basicConfig(level=logging.INFO)
 
 # Marketstack API key
-api_key = 'f28ae231f445ee199e07f8c4abf10026'
+api_key = 'cc15c80cebf384e5c0a56f5b2321c188'
 
 class StockDataFetcher:
     def __init__(self):
